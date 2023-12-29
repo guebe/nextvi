@@ -866,6 +866,7 @@ static int vi_motion(int *row, int *off)
 			return -1;
 		break;
 	case TK_CTL('a'):
+	case '*':
 		if (!(cs = vi_curword(xb, *row, *off, cnt, 0)))
 			return -1;
 		ex_krsset(cs, +1);
