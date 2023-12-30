@@ -459,6 +459,7 @@ static int vi_motionln(int *row, int cmd)
 	int cnt = (vi_arg1 ? vi_arg1 : 1) * (vi_arg2 ? vi_arg2 : 1);
 	int c = vi_read();
 	int mark, mark_row, mark_off;
+switchtop:
 	switch (c) {
 	case '\n':
 	case '+':
@@ -495,6 +496,20 @@ static int vi_motionln(int *row, int cmd)
 	case 'M':
 		*row = MIN(xtop + xrows / 2, lbuf_len(xb) - 1);
 		break;
+	case '\033':
+		c = vi_read();
+		if (c == '[') {
+			c = vi_read();
+			switch (c) {
+			case 'D': c = 'h'; goto switchtop;
+			case 'B': c = 'j'; goto switchtop;
+			case 'A': c = 'k'; goto switchtop;
+			case 'C': c = 'l'; goto switchtop;
+			case '5': vi_read(); c = TK_CTL('b'); goto switchtop;
+			case '6': vi_read(); c = TK_CTL('f'); goto switchtop;
+			}
+		}
+		return 0;
 	default:
 		if (c == cmd) {
 			*row = MIN(*row + cnt - 1, lbuf_len(xb) - 1);
